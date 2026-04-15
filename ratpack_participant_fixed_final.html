@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RATPACK 8.0 | Team Portal</title>
+  <style>
+    :root{--bg:#081120;--bg2:#0d172c;--panel:rgba(15,23,42,.88);--border:rgba(148,163,184,.18);--text:#e5eefc;--muted:#8aa0c6;--accent:#7c3aed;--accent2:#0ea5e9;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--shadow:0 20px 60px rgba(0,0,0,.35);--radius:22px;}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(124,58,237,.18),transparent 32%),radial-gradient(circle at 80% 10%,rgba(14,165,233,.14),transparent 26%),linear-gradient(180deg,var(--bg),#050814 55%,#04060d);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{overflow-x:hidden}
+    .wrap{max-width:980px;margin:0 auto;padding:20px;display:grid;gap:18px}
+    .topbar,.panel,.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(16px);overflow:hidden}
+    .topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:20px 22px;background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(7,12,24,.82))}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:900;font-size:20px;box-shadow:0 12px 28px rgba(124,58,237,.35)}
+    .title h1{margin:0;font-size:22px;letter-spacing:.4px}
+    .title p{margin:3px 0 0;color:var(--muted);font-size:13px}
+    .chip{padding:10px 14px;border-radius:999px;background:rgba(148,163,184,.09);border:1px solid var(--border);font-size:13px}
+    .chip strong{color:#fff}
+    .sync-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:#a7f3d0}
+    .sync-dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:pulse 2s infinite}
+    .sync-dot.warn{background:#f59e0b}.sync-dot.bad{background:#ef4444}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .panel .head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(255,255,255,.03),rgba(255,255,255,0))}
+    .panel .head h2{margin:0;font-size:15px;letter-spacing:.25px}
+    .panel .head .sub{color:var(--muted);font-size:12px}
+    .content{padding:16px 18px}.col{display:grid;gap:14px}.row{display:flex;gap:12px;flex-wrap:wrap}.row.tight{gap:8px}
+    .btn{appearance:none;border:0;cursor:pointer;background:linear-gradient(135deg,rgba(124,58,237,.95),rgba(14,165,233,.9));color:white;padding:11px 14px;border-radius:14px;font-weight:700;transition:transform .16s ease,filter .16s ease,opacity .16s ease;font-family:inherit}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}.btn:active{transform:translateY(1px)}.btn.secondary{background:rgba(148,163,184,.10);border:1px solid var(--border);box-shadow:none}.btn.good{background:linear-gradient(135deg,rgba(16,185,129,.95),rgba(14,165,233,.92))}.btn.bad{background:linear-gradient(135deg,rgba(239,68,68,.95),rgba(244,114,182,.88))}.btn.warn{background:linear-gradient(135deg,rgba(245,158,11,.95),rgba(249,115,22,.88))}.btn.small{padding:8px 11px;border-radius:12px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .input, select, textarea{width:100%;padding:11px 12px;border-radius:14px;background:rgba(2,6,23,.42);color:var(--text);border:1px solid rgba(148,163,184,.18);outline:none;font-family:inherit}
+    select option{background:#071022}.muted{color:var(--muted)}.tiny{font-size:12px}.footer-note{color:var(--muted);font-size:12px;line-height:1.5}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;background:rgba(148,163,184,.09);border:1px solid var(--border);color:#dbeafe}.pill.good{background:rgba(16,185,129,.12);color:#a7f3d0}.pill.bad{background:rgba(239,68,68,.12);color:#fecaca}.pill.warn{background:rgba(245,158,11,.13);color:#fde68a}
+    .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.metric{padding:16px 18px;border-radius:18px;background:rgba(148,163,184,.08);border:1px solid var(--border)}.metric .label{color:var(--muted);font-size:12px;margin-bottom:6px}.metric .value{font-size:22px;font-weight:900}
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}.table td,.table th{padding:10px 8px;text-align:left;font-size:13px}.table thead th{color:var(--muted);font-weight:700;font-size:12px}.table tbody tr{background:rgba(148,163,184,.06);border:1px solid var(--border)}.table tbody tr td:first-child{border-radius:14px 0 0 14px;padding-left:12px}.table tbody tr td:last-child{border-radius:0 14px 14px 0;padding-right:12px}
+    .round-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.round-pill{padding:10px 6px;border-radius:14px;text-align:center;font-size:12px;font-weight:700;background:rgba(148,163,184,.07);border:1px solid var(--border);color:var(--muted)}.round-pill.current{background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(14,165,233,.18));border-color:rgba(124,58,237,.45);color:#fff}
+    .timer-display{font-size:48px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.timer-label{color:var(--muted);font-size:13px;margin-top:4px;text-align:center}
+    .chart-wrap{height:260px;position:relative}canvas{width:100%;height:100%;display:block;border-radius:18px;background:linear-gradient(180deg,rgba(2,6,23,.35),rgba(2,6,23,.15))}
+    .spinner{width:48px;height:48px;border:4px solid rgba(124,58,237,.2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    .setup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.setup-card{width:min(560px,100%);padding:28px;border-radius:26px;display:grid;gap:18px;background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(16px)}
+    .setup-head{display:flex;align-items:center;gap:14px}.setup-logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:900;font-size:18px;box-shadow:0 12px 28px rgba(124,58,237,.35)}
+    .setup-step{padding:18px;border-radius:18px;background:rgba(148,163,184,.07);border:1px solid var(--border);display:grid;gap:12px}.setup-step h3{margin:0;font-size:14px;color:#c7d2fe}.setup-step p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}.setup-step a{color:#7dd3fc}
+    .code-input{font-size:26px;font-weight:900;letter-spacing:8px;text-align:center;padding:16px 12px;border-radius:16px;background:rgba(2,6,23,.5);color:var(--text);border:1px solid rgba(124,58,237,.4);outline:none;width:100%;text-transform:uppercase;font-family:inherit}
+    .qr-wrap{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.qr-box{min-height:170px;display:grid;place-items:center;border-radius:18px;background:rgba(2,6,23,.42);border:1px solid rgba(148,163,184,.18);overflow:hidden;padding:12px}
+    .session-box{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);font-size:13px;flex-wrap:wrap}.session-code{font-size:20px;font-weight:900;letter-spacing:3px;color:#c4b5fd}
+    .team-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.team-btn{padding:14px 10px;border-radius:16px;background:rgba(148,163,184,.08);border:1px solid var(--border);cursor:pointer;text-align:center;font-weight:800;font-size:15px;transition:.15s ease;color:var(--text)}.team-btn:hover{background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.4)}.team-btn.active{background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(14,165,233,.22));border-color:rgba(124,58,237,.55);box-shadow:0 8px 20px rgba(124,58,237,.15)}
+    .asset-row{display:grid;grid-template-columns:140px 110px 110px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(148,163,184,.16)}.asset-row:last-child{border-bottom:0}.bar{height:10px;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden}.bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent))}.good-text{color:#86efac}.bad-text{color:#fca5a5}.warn-text{color:#fde68a}
+    .char-badge{padding:12px 16px;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(14,165,233,.12));border:1px solid rgba(124,58,237,.3)}.char-badge .name{font-weight:800;font-size:15px;color:#fff}.char-badge .desc{font-size:12px;color:var(--muted);margin-top:4px}.char-badge .status{font-size:11px;margin-top:6px}
+    #usePowerBtn[disabled]{opacity:.4;cursor:not-allowed}
+    .market-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.market-pill{padding:10px 12px;border-radius:14px;background:rgba(148,163,184,.07);border:1px solid var(--border)}.market-pill .name{font-weight:800;font-size:12px}.market-pill .val{font-size:12px;margin-top:4px}
+    .trade-grid{display:grid;gap:10px}.split-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    /* ── New Trading Panel Styles ─────────────────────────────── */
+    .trade-tabs{display:flex;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:rgba(148,163,184,.06)}
+    .trade-tab{flex:1;padding:12px;text-align:center;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);transition:.15s ease;border:none;background:transparent}
+    .trade-tab.active-buy{background:rgba(16,185,129,.18);color:#a7f3d0;box-shadow:inset 0 -2px 0 #10b981}
+    .trade-tab.active-sell{background:rgba(239,68,68,.15);color:#fecaca;box-shadow:inset 0 -2px 0 #ef4444}
+    .asset-picker{display:grid;gap:6px;max-height:260px;overflow-y:auto;padding-right:4px}
+    .asset-pill{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-radius:13px;background:rgba(148,163,184,.07);border:1px solid var(--border);cursor:pointer;transition:.13s ease;text-align:left;width:100%}
+    .asset-pill:hover{background:rgba(148,163,184,.13)}
+    .asset-pill.sel-buy{background:rgba(16,185,129,.16);border-color:rgba(16,185,129,.45)}
+    .asset-pill.sel-sell{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.38)}
+    .asset-pill .ap-name{font-weight:800;font-size:13px;color:#fff}
+    .asset-pill .ap-held{font-size:11px;color:var(--muted)}
+    .asset-pill .ap-news{font-size:11px;font-weight:700;text-align:right}
+    .asset-pill .ap-val{font-size:11px;color:var(--muted);text-align:right}
+    .pct-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .pct-btn{padding:5px 10px;border-radius:9px;background:rgba(148,163,184,.10);border:1px solid var(--border);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;transition:.12s ease}
+    .pct-btn:hover{background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.4)}
+    /* ── Live Auction ── */
+    .auction-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#fca5a5;font-size:11px;font-weight:700}
+    .auction-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:pulse 1s infinite}
+    .bid-history-row{display:grid;grid-template-columns:80px 1fr auto;gap:8px;padding:8px 10px;border-radius:12px;font-size:12px;background:rgba(148,163,184,.07);border:1px solid var(--border)}
+    .bid-history-row.mine{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3)}
+    .bid-history-row.top{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.3)}
+    .trade-preview{padding:14px;border-radius:14px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.28);margin-top:4px;display:none}
+    .trade-preview.show{display:block}
+    .trade-preview.preview-buy{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.28)}
+    .trade-preview.preview-sell{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.25)}
+    .preview-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+    .preview-warn{color:#fde68a;font-size:12px;margin-top:8px;padding:8px;border-radius:9px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25)}
+    #waitingScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:18px;text-align:center;padding:20px}.hidden{display:none !important}
+    @media(max-width:760px){.team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-grid{grid-template-columns:1fr}.market-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.round-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.asset-row{grid-template-columns:1fr 1fr;gap:8px}.qr-wrap{grid-template-columns:1fr}.split-grid{grid-template-columns:1fr}.timer-display{font-size:36px}.wrap{padding:12px}.topbar{padding:16px}.title h1{font-size:20px}}
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<div id="setupScreen" class="setup-wrap">
+  <div class="setup-card">
+    <div class="setup-head">
+      <div class="setup-logo">RP</div>
+      <div>
+        <div style="font-weight:900;font-size:20px">RATPACK 8.0</div>
+        <div style="color:var(--muted);font-size:13px">Team Portal — connect to the moderator session</div>
+      </div>
+    </div>
+
+    <div class="setup-step">
+      <h3>Step 1 — Firebase connection</h3>
+      <p>Fill this once. It saves in your browser. Use the same Firebase project as the admin panel.</p>
+      <div class="split-grid">
+        <input id="cfg_apiKey" class="input" placeholder="apiKey" />
+        <input id="cfg_authDomain" class="input" placeholder="authDomain" />
+      </div>
+      <div class="split-grid">
+        <input id="cfg_databaseURL" class="input" placeholder="databaseURL" />
+        <input id="cfg_projectId" class="input" placeholder="projectId" />
+      </div>
+      <div class="tiny muted">Leave this editable if you move to another Firebase project later.</div>
+    </div>
+
+    <div class="setup-step">
+      <h3>Step 2 — Session code</h3>
+      <p>Ask the moderator for the 6-character session code shown in the admin panel.</p>
+      <input id="sessionInput" class="code-input" maxlength="6" placeholder="XXXXXX"
+             oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,''); updateJoinQr();"
+             onkeydown="if(event.key==='Enter') saveConnectAndJoin()"/>
+      <div class="row">
+        <button class="btn" onclick="saveConnectAndJoin()">Save & Join</button>
+        <button class="btn secondary" onclick="loadSavedAndJoin()">Use Saved Config</button>
+      </div>
+      <div class="footer-note">Optional: open this page with <code>?session=ABC123</code> and the code field will auto-fill.</div>
+    </div>
+
+    <div class="setup-step">
+      <h3>Step 3 — QR join</h3>
+      <p>Once the session code is entered, this QR points to the same participant page with the code already filled in.</p>
+      <div class="qr-wrap">
+        <div class="qr-box" id="qrBox"><div class="footer-note" id="qrFallback">Enter a session code to generate the QR.</div></div>
+        <div style="display:grid;gap:8px;min-width:180px">
+          <button class="btn secondary" onclick="copyJoinLink()">Copy join link</button>
+          <button class="btn secondary" onclick="resetSetup()">Reset saved config</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mainApp" class="hidden">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">RP</div>
+        <div class="title">
+          <h1>RATPACK 8.0 | Team Portal</h1>
+          <p>Your private portfolio view — only your team is visible here.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div class="chip">Round <strong id="roundChip">—</strong></div>
+        <div class="chip">Phase <strong id="phaseChip">—</strong></div>
+        <div class="chip">Team <strong id="teamChip">—</strong></div>
+        <span class="sync-badge"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Connecting…</span></span>
+        <button id="changeTeamBtn" class="btn secondary small" onclick="chooseDifferentTeam()">Team Locked</button>
+        <button class="btn secondary small" onclick="leaveSession()">Leave Session</button>
+      </div>
+    </div>
+
+    <section class="panel" id="selectorPanel">
+      <div class="head">
+        <div>
+          <h2>Select Your Team</h2>
+          <div class="sub">Pick your own team once. The choice is saved on this device.</div>
+        </div>
+      </div>
+      <div class="content col">
+        <div class="team-grid" id="teamSelectGrid"></div>
+        <div class="footer-note">This panel only shows team numbers and names. No leaderboard, no other team portfolio.</div>
+      </div>
+    </section>
+
+    <div id="waitingScreen" class="panel hidden">
+      <div class="content" style="text-align:center;padding:28px">
+        <div class="spinner"></div>
+        <div style="margin-top:14px;font-size:15px;color:var(--text);font-weight:700">Waiting for game state from admin panel…</div>
+        <div class="footer-note" style="max-width:420px;margin:10px auto 0">Make sure the admin panel is open, connected to the same Firebase project, and has pushed the session state.</div>
+      </div>
+    </div>
+
+    <div id="portfolioSection" class="hidden" style="display:grid;gap:18px">
+      <section class="panel">
+        <div class="head"><div><h2>Round Timer</h2><div class="sub" id="timerSub">—</div></div><div class="pill" id="timerPill">Paused</div></div>
+        <div class="content" style="text-align:center;padding:24px"><div class="timer-display" id="timerDisplay">—</div><div class="timer-label" id="timerLabelText">—</div></div>
+      </section>
+
+      <section class="panel">
+        <div class="head"><div><h2>Round Progress</h2></div></div>
+        <div class="content"><div class="round-grid" id="roundGrid"></div></div>
+      </section>
+
+      <section class="panel">
+        <div class="head">
+          <div><h2 id="teamTitle">Your Portfolio</h2><div class="sub" id="teamSubtitle">—</div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill good" id="marketPill">—</span><span class="pill warn" id="charPill">—</span></div>
+        </div>
+        <div class="content col">
+          <div class="metric-grid">
+            <div class="metric"><div class="label">Cash Balance</div><div class="value" id="cashVal">—</div></div>
+            <div class="metric"><div class="label">Total Portfolio Value</div><div class="value" id="totalVal">—</div></div>
+            <div class="metric"><div class="label">Assets Value</div><div class="value" id="assetsVal">—</div></div>
+            <div class="metric"><div class="label">Debt Due</div><div class="value bad-text" id="debtVal">—</div></div>
+          </div>
+          <div id="assetTable"></div>
+          <div id="charCard" style="display:none" class="char-badge">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <div>
+                <div class="name" id="charName">—</div>
+                <div class="desc" id="charDesc">—</div>
+                <div class="status" id="charStatus">—</div>
+              </div>
+              <button id="usePowerBtn" class="btn warn small" onclick="requestUsePower()" style="white-space:nowrap;margin-top:4px">⚡ Use Power</button>
+            </div>
+          </div>
+          <div class="panel" style="background:rgba(148,163,184,.05)">
+            <div class="head"><div><h2>Market Overview</h2><div class="sub">Global sector news that affects your team.</div></div></div>
+            <div class="content"><div class="market-grid" id="marketGrid"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="head"><div><h2>Trade Assets</h2><div class="sub">Pick an asset → enter amount → confirm.</div></div><div id="tradeModePill" class="pill good">🟢 Buying</div></div>
+        <div class="content col">
+          <!-- Buy / Sell toggle -->
+          <div class="trade-tabs">
+            <button id="tabBuy"  class="trade-tab active-buy"  onclick="setTradeMode('buy')">🟢 Buy</button>
+            <button id="tabSell" class="trade-tab"             onclick="setTradeMode('sell')">🔴 Sell</button>
+          </div>
+          <!-- Asset picker (live, shows holdings + news) -->
+          <div class="tiny muted" style="margin-bottom:2px">Select asset</div>
+          <div class="asset-picker" id="assetPicker"></div>
+          <!-- Amount input + quick % buttons -->
+          <div>
+            <div class="tiny muted">Amount (₹)</div>
+            <input id="tradeAmountInput" class="input" type="number" min="0" step="1000" placeholder="e.g. 5000000"
+                   oninput="updateTradePreview()" />
+            <div class="pct-row" id="pctRow"></div>
+          </div>
+          <!-- Live preview / confirmation -->
+          <div class="trade-preview" id="tradePreview"></div>
+          <!-- Execute -->
+          <button id="tradeExecuteBtn" class="btn good" onclick="executeTrade()" style="width:100%;padding:14px;font-size:15px">
+            🟢 Confirm Buy
+          </button>
+          <div class="footer-note">Every trade is logged instantly on the admin panel. Double-check the preview before confirming.</div>
+        </div>
+      </section>
+
+      <!-- ═══ ROUND 5 VOTING & BETTING PANEL (hidden until Round 5) ═══ -->
+      <section class="panel" id="votingPanel" style="display:none;border:1px solid rgba(124,58,237,.4);background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(14,165,233,.05))">
+        <div class="head" style="background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(14,165,233,.10))">
+          <div>
+            <h2 style="font-size:17px">⚔️ Round 5 — Betrayal Round</h2>
+            <div class="sub">Cast your vote and place your bet. Votes are confidential until the moderator reveals results.</div>
+          </div>
+          <div id="votingStatusPill" class="pill warn">Awaiting your vote</div>
+        </div>
+        <div class="content col" style="gap:18px">
+
+          <!-- Rules reminder -->
+          <div style="padding:12px 14px;border-radius:14px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.28);font-size:12px;line-height:1.7">
+            <strong style="color:#fde68a">How it works:</strong><br>
+            • Vote for the team you think will become the <strong>Influence Leader</strong> (most votes)<br>
+            • Teams that voted for the Influence Leader <span class="good-text"><strong>get their bet doubled</strong></span><br>
+            • Teams that voted for the wrong team <span class="bad-text"><strong>lose their bet</strong></span><br>
+            • The Influence Leader's corpus is reduced by <strong>10%</strong> as a penalty<br>
+            • Min bet: <strong>₹50 Lakhs</strong> &nbsp;|&nbsp; Max bet: <strong>25% of your total portfolio</strong>
+          </div>
+
+          <!-- Vote section -->
+          <div>
+            <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#c4b5fd">🗳️ Cast Your Vote</div>
+            <div id="voteTeamGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
+            <div id="voteConfirmedMsg" style="display:none;padding:10px 14px;border-radius:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-size:13px;margin-top:8px">
+              ✅ Vote cast for <strong id="voteTargetName">—</strong>. Confidential until reveal.
+            </div>
+          </div>
+
+          <!-- Bet section -->
+          <div>
+            <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#c4b5fd">💰 Place Your Bet</div>
+            <div id="betPortfolioInfo" class="footer-note" style="margin-bottom:8px"></div>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+              <div>
+                <div class="tiny muted">Bet amount (₹)</div>
+                <input id="participantBetInput" class="input" type="number" min="5000000" placeholder="Min ₹50 Lakhs" oninput="updateBetPreview()"/>
+              </div>
+              <button class="btn warn" onclick="submitBet()" id="submitBetBtn">Place Bet</button>
+            </div>
+            <!-- Quick bet presets -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" id="betPresetRow"></div>
+            <div id="betPreviewBox" style="margin-top:8px"></div>
+            <div id="betConfirmedMsg" style="display:none;padding:10px 14px;border-radius:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-size:13px;margin-top:8px">
+              ✅ Bet of <strong id="betAmountConfirmed">—</strong> placed. Good luck!
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="head"><div><h2>Portfolio Growth Graph</h2><div class="sub">Your team's history across rounds.</div></div></div>
+        <div class="content"><div class="chart-wrap"><canvas id="graphCanvas"></canvas></div></div>
+      </section>
+
+      <!-- ═══ LIVE AUCTION PANEL (auto-appears when admin starts an auction) ═══ -->
+      <section id="liveAuctionPanel" style="display:none;border:2px solid rgba(239,68,68,.5);background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(245,158,11,.04));border-radius:var(--radius);overflow:hidden;box-shadow:0 0 40px rgba(239,68,68,.15)">
+        <div class="head" style="background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(245,158,11,.08))">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span class="auction-badge"><span class="auction-dot"></span>LIVE AUCTION</span>
+              <h2 id="auctionItemName" style="margin:0;font-size:18px;color:#fde68a">—</h2>
+            </div>
+            <div class="sub" style="margin-top:4px">Bid from your device — highest bid when the moderator knocks down wins the item.</div>
+          </div>
+          <div id="auctionCountdownBadge" style="font-size:22px;font-weight:900;color:#fca5a5;display:none"></div>
+        </div>
+        <div class="content col" style="gap:16px">
+
+          <!-- Current bid display -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div class="metric">
+              <div class="label">Current Highest Bid</div>
+              <div class="value good-text" id="auctionCurrentBid" style="font-size:20px">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Leading Team</div>
+              <div class="value" id="auctionLeader" style="font-size:15px">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Min Next Bid</div>
+              <div class="value warn-text" id="auctionMinNext" style="font-size:18px">—</div>
+            </div>
+          </div>
+
+          <!-- Your status -->
+          <div id="auctionYourStatus" style="padding:10px 14px;border-radius:12px;background:rgba(148,163,184,.08);border:1px solid var(--border);font-size:13px">
+            Your cash: <strong id="auctionYourCash">—</strong> &nbsp;·&nbsp; Your bids this auction: <strong id="auctionYourBidCount">0</strong>
+          </div>
+
+          <!-- Bid input -->
+          <div id="auctionBidSection">
+            <div class="tiny muted" style="margin-bottom:5px">Your bid (₹)</div>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end">
+              <input id="auctionBidInput" class="input" type="number" min="0" step="1000000" placeholder="Enter your bid…" oninput="updateAuctionBidPreview()"/>
+              <button class="btn bad" id="placeBidBtn" onclick="placeBid()" style="padding:12px 20px;font-size:15px;white-space:nowrap">⬆ Bid</button>
+            </div>
+            <!-- Quick increment buttons -->
+            <div id="auctionQuickBtns" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+            <!-- Bid preview -->
+            <div id="auctionBidPreview" style="margin-top:8px"></div>
+          </div>
+
+          <div id="auctionWinMsg" style="display:none;padding:14px;border-radius:14px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);font-size:15px;font-weight:800;text-align:center;color:#a7f3d0">
+            🏆 You won this auction!
+          </div>
+          <div id="auctionEndedMsg" style="display:none;padding:12px 14px;border-radius:12px;background:rgba(148,163,184,.08);border:1px solid var(--border);font-size:13px;text-align:center">
+            Auction closed.
+          </div>
+
+          <!-- Live bid history -->
+          <div>
+            <div style="font-weight:800;font-size:12px;color:var(--muted);margin-bottom:6px">BID HISTORY</div>
+            <div id="auctionBidHistory" style="max-height:200px;overflow-y:auto;display:grid;gap:5px">
+              <div class="footer-note">No bids yet.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ASSETS = ["Consumer Retail","Technology Platforms","Automobile Manufacturing","Agricultural Commodities","Pharmaceutical Research","Renewable Energy","Commercial Banking","Infrastructure Projects","Real Estate Development","Telecommunications Networks","Fast Moving Consumer Goods","Logistics & Supply Chains"];
+  const ROUND_NAMES = ["Foundation Protocol","Rebuilding Wave","Liquidity Crunch","Second Fracture","Betrayal Round"];
+  const STORAGE = { config: "ratpack_p_fb_config", session: "ratpack_p_session", team: "ratpack_my_team", teamLock: "ratpack_team_locked" };
+  const TEAM_PINS = []; // Optional fallback. Example: ["1111","2222",...]
+  const el = id => document.getElementById(id);
+
+  let fbApp = null, fbDb = null, sessionRef = null, connectionRef = null;
+  let currentSession = "";
+  let currentState = null;
+  let selectedTeam = null;
+  let lastGraphSignature = "";
+  let qr = null;
+
+  function nowTime(){ return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
+  function saveConfig(cfg){ localStorage.setItem(STORAGE.config, JSON.stringify(cfg)); }
+  function loadConfig(){ try { return JSON.parse(localStorage.getItem(STORAGE.config) || "null"); } catch(e){ return null; } }
+  function saveSession(code){ localStorage.setItem(STORAGE.session, code); }
+  function loadSession(){ return (localStorage.getItem(STORAGE.session) || "").trim().toUpperCase(); }
+  function saveTeam(idx){ localStorage.setItem(STORAGE.team, String(idx)); }
+  function loadTeam(){ const v = localStorage.getItem(STORAGE.team); return v === null ? null : Number(v); }
+  function saveTeamLock(){ localStorage.setItem(STORAGE.teamLock, "1"); }
+  function loadTeamLock(){ return localStorage.getItem(STORAGE.teamLock) === "1"; }
+  function clearTeam(){ localStorage.removeItem(STORAGE.team); localStorage.removeItem(STORAGE.teamLock); selectedTeam = null; }
+  function clearSession(){ localStorage.removeItem(STORAGE.session); }
+  function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function defaultState(){
+    return {
+      round: 1,
+      timer: 1200,
+      timerRunning: false,
+      timerLabel: "Round 1 — 20 min",
+      globalNews: Object.fromEntries(ASSETS.map(a => [a, 0])),
+      logs: [{ time: nowTime(), message: "Waiting for admin to start the game." }],
+      teams: Array.from({ length: 8 }, (_, i) => ({
+        name: `Team ${i + 1}`,
+        cash: 100000000,
+        assets: Object.fromEntries(ASSETS.map(a => [a, 0])),
+        marketName: "Stable Developed Economy",
+        marketMultiplier: 1,
+        character: "",
+        usedPowers: {},
+        vote: "",
+        voteWeight: 1,
+        betDraft: 0,
+        betPlaced: 0,
+        capitalDebt: 0,
+        immunityRound: 0,
+        insiderUsed: false,
+        history: [{ round: 0, value: 100000000 }]
+      }))
+    };
+  }
+  function normalizeState(raw){
+    const base = defaultState();
+    if(!raw || typeof raw !== "object") return base;
+    const out = JSON.parse(JSON.stringify(base));
+    Object.assign(out, raw);
+    out.round = Math.max(1, Math.min(5, Number(out.round || 1)));
+    out.timer = Number.isFinite(Number(out.timer)) ? Number(out.timer) : 1200;
+    out.timerRunning = !!out.timerRunning;
+    out.globalNews = { ...base.globalNews, ...(raw.globalNews || {}) };
+    out.logs = Array.isArray(raw.logs) ? raw.logs.slice(-60) : base.logs;
+    out.teams = Array.isArray(raw.teams) && raw.teams.length ? raw.teams : base.teams;
+    return out;
+  }
+  function currentPhase(round){ return ROUND_NAMES[round - 1] || "—"; }
+  function formatINR(n){ const val = Number(n) || 0; const abs = Math.abs(val); let s; if(abs >= 1e7) s = (abs/1e7).toFixed(2) + " Cr"; else if(abs >= 1e5) s = (abs/1e5).toFixed(2) + " L"; else s = abs.toLocaleString("en-IN"); return (val < 0 ? "−" : "") + "₹" + s; }
+  function formatTime(sec){ const s = Math.max(0, Math.floor(Number(sec)||0)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); }
+  function getState(){ return currentState ? clone(currentState) : defaultState(); }
+  function selectedTeamObj(st = getState()){ if(selectedTeam === null || !st.teams || !st.teams[selectedTeam]) return null; return st.teams[selectedTeam]; }
+  function computeAssetValue(team, asset, st){
+    const invested = Number(team?.assets?.[asset] || 0);
+    if(invested === 0) return 0;
+    // Precision Allocation: fixed +10%, overrides all news
+    if(team?.precisionRound && Number(team.precisionRound) === Number(st.round) && team.precisionAsset === asset){
+      return invested * 1.10;
+    }
+    const rawNews = Number(st.globalNews?.[asset] || 0);
+    const mult    = Number(team?.marketMultiplier || 1);
+    // Market Immunity: zero negative news
+    let n = (Number(team?.immunityRound) === Number(st.round) && rawNews < 0) ? 0 : rawNews;
+    // All-In Bet: double news effect (positive and negative)
+    if(team?.allInRound && Number(team.allInRound) === Number(st.round) && team.allInAsset === asset) n = n * 2;
+    // Multiplier Amplifier: 1.5× on positive news only
+    const hasAmp    = team?.amplifierRound && Number(team.amplifierRound) === Number(st.round);
+    const finalMult = (hasAmp && n > 0) ? mult * 1.5 : mult;
+    return invested * (1 + n * finalMult);
+  }
+  function computePortfolioValue(team, st){ if(!team) return 0; const assetVal = ASSETS.reduce((sum, asset) => sum + computeAssetValue(team, asset, st), 0); return Math.round((Number(team.cash)||0) + assetVal - (Number(team.capitalDebt)||0)); }
+  function updateSyncBadge(kind, text){ const dot = el("syncDot"); const label = el("syncLabel"); label.textContent = text; dot.className = "sync-dot" + (kind === "warn" ? " warn" : kind === "bad" ? " bad" : ""); }
+  function showSetup(){ el("setupScreen").classList.remove("hidden"); el("mainApp").classList.add("hidden"); }
+  function showApp(){ el("setupScreen").classList.add("hidden"); el("mainApp").classList.remove("hidden"); }
+  function buildJoinUrl(code){ const url = new URL(window.location.href); url.searchParams.set("session", code); return url.toString(); }
+  function updateJoinQr(){ const code = (el("sessionInput").value || "").trim().toUpperCase(); const qrBox = el("qrBox"); if(!code || code.length < 4){ qrBox.innerHTML = '<div class="footer-note" id="qrFallback">Enter a session code to generate the QR.</div>'; return; } const url = buildJoinUrl(code); if(typeof QRCode === "function"){ qrBox.innerHTML = ""; qr = new QRCode(qrBox, { text: url, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.M }); } else { qrBox.innerHTML = `<div class="footer-note">QR library failed to load.<br><br><code>${url}</code></div>`; } }
+  function copyJoinLink(){ const code = (el("sessionInput").value || loadSession()).trim().toUpperCase(); if(!code) return alert("Enter a session code first."); const link = buildJoinUrl(code); navigator.clipboard.writeText(link).then(() => alert("Join link copied.")).catch(() => prompt("Copy this link:", link)); }
+  function resetSetup(){ if(!confirm("Reset saved config, session, and team on this device?")) return; localStorage.removeItem(STORAGE.config); localStorage.removeItem(STORAGE.session); localStorage.removeItem(STORAGE.team); location.reload(); }
+  function initFirebase(cfg){
+    try{
+      if(!cfg || !cfg.apiKey || !cfg.databaseURL || !cfg.projectId){ alert("Please fill apiKey, databaseURL, and projectId."); return false; }
+      if(fbApp){ try{ fbApp.delete(); }catch(e){} }
+      fbApp = firebase.initializeApp(cfg, "ratpackP_" + Date.now());
+      fbDb = fbApp.database();
+      connectionRef = fbDb.ref(".info/connected");
+      connectionRef.on("value", snap => { updateSyncBadge(snap.val() ? "good" : "warn", snap.val() ? "Connected" : "Offline"); });
+      return true;
+    }catch(err){ console.error(err); alert("Firebase init failed: " + err.message); return false; }
+  }
+  function attachSessionListener(){
+    if(!sessionRef) return;
+    sessionRef.off();
+    updateSyncBadge("warn", "Connecting…");
+    sessionRef.on("value", snap => {
+      if(!snap.exists()){
+        currentState = defaultState();
+        updateSyncBadge("warn", "Waiting…");
+        render();
+        return;
+      }
+      currentState = normalizeState(snap.val());
+      updateSyncBadge("good", "Live");
+      render();
+    }, err => { console.error(err); updateSyncBadge("bad", "Error"); });
+  }
+  function startSession(code){
+    currentSession = code.trim().toUpperCase();
+    if(!currentSession || currentSession.length < 4){ alert("Enter a valid session code."); return false; }
+    if(!fbDb){ alert("Firebase is not connected yet."); return false; }
+    saveSession(currentSession);
+    sessionRef = fbDb.ref("sessions/" + currentSession + "/state");
+    el("sessionInput").value = currentSession;
+    updateJoinQr();
+    attachSessionListener();
+    startAuctionListener();
+    showApp();
+    return true;
+  }
+  function isPinProtectedForTeam(st, idx){ const serverPins = Array.isArray(st.teamPins) ? st.teamPins : []; const fallback = TEAM_PINS[idx]; const pin = (serverPins[idx] ?? fallback ?? "").toString().trim(); return pin.length > 0 ? pin : null; }
+  function requestTeamSelection(idx){
+    const st = getState();
+    if (loadTeamLock() && selectedTeam !== null && selectedTeam !== idx) {
+      alert("This device is already locked to Team " + (selectedTeam + 1) + ".");
+      return;
+    }
+    const pin = isPinProtectedForTeam(st, idx);
+    if(pin){
+      const entered = prompt(`Enter PIN for Team ${idx + 1}`);
+      if(entered === null) return;
+      if(entered.trim() !== pin){
+        alert("Wrong PIN.");
+        return;
+      }
+    }
+    selectedTeam = idx;
+    saveTeam(idx);
+    saveTeamLock();
+    el("selectorPanel").classList.add("hidden");
+    render();
+  }
+  function chooseDifferentTeam(){
+    if (loadTeamLock()) {
+      alert("This device is locked to its selected team. Use Leave Session / Reset Setup to change it.");
+      return;
+    }
+    clearTeam();
+    el("selectorPanel").classList.remove("hidden");
+    render();
+  }
+  function leaveSession(){ if(!confirm("Leave this session on this device?")) return; clearSession(); clearTeam(); if(sessionRef) sessionRef.off(); sessionRef = null; currentSession = ""; currentState = null; showSetup(); updateSyncBadge("warn", "Connecting…"); }
+  function renderTeamSelector(st){ const grid = el("teamSelectGrid"); const teams = st.teams || []; grid.innerHTML = teams.map((t, idx) => `<button class="team-btn ${selectedTeam===idx ? "active" : ""}" data-team="${idx}">Team ${idx + 1}</button>`).join(""); [...grid.querySelectorAll("[data-team]")].forEach(btn => btn.addEventListener("click", () => requestTeamSelection(Number(btn.dataset.team)))); }
+  function renderMarketOverview(st){ const box = el("marketGrid"); box.innerHTML = ASSETS.map(asset => { const value = Number(st.globalNews?.[asset] || 0) * 100; const cls = value > 0 ? "good-text" : value < 0 ? "bad-text" : "warn-text"; const sign = value >= 0 ? "+" : ""; return `<div class="market-pill"><div class="name">${asset}</div><div class="val ${cls}">${sign}${value.toFixed(2)}%</div></div>`; }).join(""); }
+  function renderGraph(team, st){ const canvas = el("graphCanvas"); if(!canvas || !team) return; const rect = canvas.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1; canvas.width = Math.max(600, Math.floor(rect.width * dpr)); canvas.height = Math.max(260, Math.floor(rect.height * dpr)); const ctx = canvas.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); const w = rect.width; const h = rect.height; ctx.clearRect(0,0,w,h); const data = Array.isArray(team.history) && team.history.length ? team.history : [{ round: 0, value: team.cash }]; const sig = JSON.stringify(data); if(sig === lastGraphSignature) return; lastGraphSignature = sig; const values = data.map(d => Number(d.value)||0); const min = Math.min(...values); const max = Math.max(...values); const range = Math.max(1, max - min); const padX = 40, padY = 24, innerW = w - padX*2, innerH = h - padY*2; ctx.strokeStyle = "rgba(148,163,184,.10)"; for(let i=0;i<=4;i++){ const y = padY + (innerH/4)*i; ctx.beginPath(); ctx.moveTo(padX,y); ctx.lineTo(w-padX,y); ctx.stroke(); } ctx.fillStyle = "rgba(226,232,240,.75)"; ctx.font = "12px Inter, sans-serif"; ctx.fillText(formatINR(max), 6, padY + 4); ctx.fillText(formatINR(min), 6, h - padY); const points = data.map((d,i)=>({ x: padX + (innerW * (i/Math.max(1,data.length-1))), y: padY + innerH - (((Number(d.value)||0) - min) / range) * innerH })); if(points.length > 1){ ctx.lineWidth = 3; ctx.strokeStyle = "rgba(14,165,233,.9)"; ctx.beginPath(); points.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y)); ctx.stroke(); } points.forEach(p => { ctx.beginPath(); ctx.arc(p.x,p.y,4.5,0,Math.PI*2); ctx.fillStyle = "rgba(124,58,237,.95)"; ctx.fill(); }); }
+  function render(){
+    const st = currentState ? normalizeState(currentState) : defaultState();
+    currentState = clone(st);
+
+    if (selectedTeam !== null) {
+      el("changeTeamBtn").textContent = "Team Locked";
+      el("changeTeamBtn").disabled = true;
+      el("changeTeamBtn").title = "This device is locked to Team " + (selectedTeam + 1);
+    } else {
+      el("changeTeamBtn").textContent = "Change Team";
+      el("changeTeamBtn").disabled = false;
+      el("changeTeamBtn").title = "Choose a team to lock this device";
+    }
+
+    el("roundChip").textContent = st.round || "—";
+    el("phaseChip").textContent = currentPhase(st.round);
+    el("teamChip").textContent = selectedTeam === null ? "—" : `Team ${selectedTeam + 1}`;
+    if(!selectedTeam && selectedTeam !== 0) el("selectorPanel").classList.remove("hidden"); else el("selectorPanel").classList.add("hidden");
+    renderTeamSelector(st);
+    const team = selectedTeamObj(st);
+    if(!team){ el("waitingScreen").classList.add("hidden"); el("portfolioSection").classList.add("hidden"); return; }
+    el("waitingScreen").classList.add("hidden"); el("portfolioSection").classList.remove("hidden");
+    el("timerDisplay").textContent = formatTime(st.timer);
+    el("timerLabelText").textContent = st.timerRunning ? "Timer running" : "Timer paused";
+    el("timerSub").textContent = `Round ${st.round} · ${currentPhase(st.round)}`;
+    el("timerPill").textContent = st.timerRunning ? "▶ Running" : "⏸ Paused";
+    el("timerPill").className = "pill " + (st.timerRunning ? "good" : "warn");
+    el("roundGrid").innerHTML = [1,2,3,4,5].map(r => `<div class="round-pill ${r===st.round ? "current":""}">R${r}<br><span style="font-weight:400;font-size:11px">${ROUND_NAMES[r-1]}</span></div>`).join("");
+    const total = computePortfolioValue(team, st);
+    const assetVal = ASSETS.reduce((sum, asset) => sum + computeAssetValue(team, asset, st), 0);
+    el("teamTitle").textContent = `${team.name} — Your Portfolio`;
+    el("teamSubtitle").textContent = `Round ${st.round} · ${currentPhase(st.round)}`;
+    el("marketPill").textContent = `${team.marketName || "Stable Developed Economy"} • ${Number(team.marketMultiplier || 1).toFixed(2)}x`;
+    el("charPill").textContent = team.character || "No character";
+    el("cashVal").textContent = formatINR(team.cash);
+    el("totalVal").textContent = formatINR(total);
+    el("assetsVal").textContent = formatINR(assetVal);
+    el("debtVal").textContent = formatINR(team.capitalDebt || 0);
+    el("assetTable").innerHTML = `<table class="table"><thead><tr><th>Asset</th><th>Invested</th><th>Effective Return</th><th>Current Value</th><th>Gain/Loss</th></tr></thead><tbody>${ASSETS.map(asset => {
+      const invested = Number(team.assets?.[asset] || 0);
+      const current  = computeAssetValue(team, asset, st);
+      const gain     = current - invested;
+      // Display note if a special power is active on this asset
+      let noteTag = "";
+      if(team.precisionRound === st.round && team.precisionAsset === asset)
+        noteTag = `<span class="good-text" style="font-size:10px"> 🎯+10%</span>`;
+      else if(team.allInRound === st.round && team.allInAsset === asset)
+        noteTag = `<span class="warn-text" style="font-size:10px"> 🎲×2</span>`;
+      const effPct = invested > 0 ? ((current - invested) / invested) * 100 : 0;
+      const cls = effPct > 0 ? "good-text" : effPct < 0 ? "bad-text" : "warn-text";
+      return `<tr><td><strong>${asset}</strong>${noteTag}</td><td>${formatINR(invested)}</td><td class="${cls}">${effPct >= 0 ? "+" : ""}${effPct.toFixed(1)}%</td><td>${formatINR(current)}</td><td class="${gain >= 0 ? "good-text" : "bad-text"}">${gain >= 0 ? "+" : ""}${formatINR(gain)}</td></tr>`;
+    }).join("")}</tbody></table>`;
+    el("charCard").style.display = team.character ? "block" : "none";
+    const usePowerBtn = el("usePowerBtn");
+    if(team.character){
+      el("charName").textContent = team.character;
+      const CHAR_DESC = {
+        "Market Override":       "After a news event is revealed, reverse the direction of movement for one sector.",
+        "Precision Allocation":  "One chosen sector gives a fixed +10% return this round, regardless of actual market news.",
+        "Capital Surge":         "Receive ₹1 Crore now. Repay ₹1.25 Crore at the start of the next round.",
+        "Vote Manipulator":      "Round 5 only — double your vote weight OR cancel any one team's vote.",
+        "Market Immunity":       "No losses from falling asset values for one full round. Positive gains still apply.",
+        "Loss Cushion":          "If your portfolio experiences a loss in any one phase, 30% of that loss is refunded as cash.",
+        "Multiplier Amplifier":  "All positive returns are multiplied by 1.5× for one chosen round. Negative movements unchanged.",
+        "All-In Bet":            "Declare All-In on one sector you hold — returns AND losses from that sector are ×2 this round."
+      };
+      el("charDesc").textContent = CHAR_DESC[team.character] || "No description available.";
+      const isUsed = !!team.usedPowers?.[team.character];
+      el("charStatus").textContent = isUsed ? "✅ Power Used" : "🟡 Power Available — notify your moderator to activate";
+      // Show active power status
+      const activeNotes = [];
+      if(team.immunityRound  === st.round) activeNotes.push("🛡️ Immunity active");
+      if(team.amplifierRound === st.round) activeNotes.push("⚡ Amplifier ×1.5 active");
+      if(team.precisionRound === st.round && team.precisionAsset) activeNotes.push(`🎯 ${team.precisionAsset} +10%`);
+      if(team.allInRound     === st.round && team.allInAsset)     activeNotes.push(`🎲 All-In on ${team.allInAsset}`);
+      if(activeNotes.length) el("charStatus").textContent += " · " + activeNotes.join(" · ");
+      if(usePowerBtn){
+        usePowerBtn.disabled  = isUsed;
+        usePowerBtn.textContent = isUsed ? "✅ Power Used" : "⚡ Use Power";
+        usePowerBtn.className   = "btn small " + (isUsed ? "secondary" : "warn");
+      }
+    } else {
+      if(usePowerBtn){ usePowerBtn.disabled = true; usePowerBtn.textContent = "⚡ Use Power"; }
+    }
+    renderMarketOverview(st);
+    // ── New trading panel (does NOT reset selectedTradeAsset) ──
+    renderAssetPicker();
+    renderPctButtons();
+    renderVotingPanel();
+    renderGraph(team, st);
+  }
+  function ensureSessionReady(){ if(!sessionRef) throw new Error("Session not connected."); }
+  async function applyTeamTrade(action, asset, amount){
+    try{
+      ensureSessionReady();
+      const idx = selectedTeam;
+      if(idx === null && idx !== 0){
+        alert("Select your team first.");
+        return;
+      }
+      const tradeAmount = Number(amount);
+      if(!Number.isFinite(tradeAmount) || tradeAmount <= 0){
+        alert("Enter a valid amount.");
+        return;
+      }
+      if(!sessionRef){
+        alert("Session not connected.");
+        return;
+      }
+
+      updateSyncBadge("warn", "Saving…");
+
+      const teamRef = sessionRef.child(`teams/${idx}`);
+      const logsRef = sessionRef.child("logs");
+
+      const teamCommit = await new Promise((resolve, reject) => {
+        teamRef.transaction((team) => {
+          team = team && typeof team === "object" ? team : {};
+          team.assets = team.assets && typeof team.assets === "object" ? team.assets : {};
+          team.cash = Number(team.cash || 0);
+          team.assets[asset] = Number(team.assets[asset] || 0);
+
+          if(action === "buy"){
+            if(team.cash < tradeAmount) return;
+            team.cash -= tradeAmount;
+            team.assets[asset] += tradeAmount;
+          } else {
+            if(team.assets[asset] < tradeAmount) return;
+            team.assets[asset] -= tradeAmount;
+            team.cash += tradeAmount;
+          }
+
+          return team;
+        }, (error, committed, snapshot) => {
+          if(error) return reject(error);
+          if(!committed || !snapshot || !snapshot.exists()) return reject(new Error("Trade could not be committed."));
+          resolve(snapshot.val());
+        }, false);
+      });
+
+      const tradeLabel = `${action === "buy" ? "bought" : "sold"} ${formatINR(tradeAmount)} of ${asset}`;
+
+      await new Promise((resolve, reject) => {
+        logsRef.transaction((logs) => {
+          logs = Array.isArray(logs) ? logs : [];
+          const teamName = (currentState && currentState.teams && currentState.teams[idx] && currentState.teams[idx].name) ? currentState.teams[idx].name : `Team ${idx + 1}`;
+          logs.push({ time: nowTime(), message: `${teamName} ${tradeLabel}.` });
+          return logs.slice(-120);
+        }, (error, committed) => {
+          if(error) return reject(error);
+          if(committed === false) return reject(new Error("Log could not be updated."));
+          resolve();
+        }, false);
+      });
+
+      // ── FIX: Apply trade result directly to local state from the committed
+      //    transaction value. Do NOT read back from Firebase here — a read
+      //    could race with an admin push and return stale (pre-trade) data,
+      //    which is exactly what made trades "disappear" after 1-2 seconds. ──
+      if(!currentState) currentState = defaultState();
+      if(!currentState.teams) currentState.teams = defaultState().teams;
+      currentState.teams[idx] = teamCommit;
+
+      // Signal admin to wake up and merge the updated teams + logs
+      sessionRef.child("_participantDirty").set(true).catch(() => {});
+
+      updateSyncBadge("good", "Live");
+      render();
+    }catch(error){
+      console.error(error);
+      updateSyncBadge("bad", "Error");
+      alert("Trade failed: " + error.message);
+    }
+  }
+
+  // ── Use Power: participant presses the button, logs a request to admin ──
+  function requestUsePower(){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team || !team.character){ alert("No character assigned to your team yet."); return; }
+    if(team.usedPowers?.[team.character]){
+      alert("Your power has already been used this game."); return;
+    }
+    if(!sessionRef){ alert("Not connected to session."); return; }
+
+    const confirmed = confirm(
+      `⚡ REQUEST TO USE POWER\n\n` +
+      `Character: ${team.character}\n\n` +
+      `This will send a use-power request visible to the moderator in the admin log.\n` +
+      `The moderator will confirm and activate the power from the admin panel.\n\n` +
+      `Proceed?`
+    );
+    if(!confirmed) return;
+
+    // Write a request entry into the Firebase logs so admin sees it instantly
+    const logsRef   = sessionRef.child("logs");
+    const teamName  = team.name;
+    const charName  = team.character;
+    const entry     = { time: nowTime(), message: `🔔 POWER REQUEST: ${teamName} wants to use [${charName}] — awaiting moderator activation.` };
+    logsRef.transaction(logs => {
+      logs = Array.isArray(logs) ? logs : [];
+      logs.push(entry);
+      return logs.slice(-120);
+    }, () => {});
+    sessionRef.child("_participantDirty").set(true).catch(() => {});
+    alert("✅ Power request sent to moderator! They will activate it from the admin panel.");
+  }
+
+  window.requestUsePower = requestUsePower;
+
+  // ─── Round 5 Voting & Betting ────────────────────────────────────
+
+  function renderVotingPanel(){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    const panel = el("votingPanel");
+    if(!panel) return;
+    const isR5 = st.round === 5;
+    panel.style.display = isR5 ? "" : "none";
+    if(!isR5 || !team) return;
+
+    const total        = computePortfolioValue(team, st);
+    const minBet       = 5000000;
+    const maxBet       = Math.floor(total * 0.25);
+    const alreadyVoted = team.vote !== "" && team.vote !== null && team.vote !== undefined;
+    const alreadyBet   = Number(team.betPlaced) > 0;
+
+    const statusEl = el("votingStatusPill");
+    if(statusEl){
+      if(alreadyVoted && alreadyBet){ statusEl.textContent = "✅ Vote & Bet submitted"; statusEl.className = "pill good"; }
+      else if(alreadyVoted){ statusEl.textContent = "🗳️ Voted — place your bet"; statusEl.className = "pill warn"; }
+      else { statusEl.textContent = "Awaiting your vote"; statusEl.className = "pill warn"; }
+    }
+
+    const infoEl = el("betPortfolioInfo");
+    if(infoEl) infoEl.textContent = `Portfolio: ${formatINR(total)} · Min: ${formatINR(minBet)} · Max (25%): ${formatINR(maxBet)}`;
+
+    const gridEl      = el("voteTeamGrid");
+    const confirmedEl = el("voteConfirmedMsg");
+    const targetNameEl= el("voteTargetName");
+    if(gridEl){
+      if(alreadyVoted){
+        gridEl.style.display = "none";
+        if(confirmedEl) confirmedEl.style.display = "";
+        const votedTeam = st.teams[Number(team.vote)];
+        if(targetNameEl) targetNameEl.textContent = votedTeam ? votedTeam.name : "a team";
+      } else {
+        if(confirmedEl) confirmedEl.style.display = "none";
+        gridEl.style.display = "grid";
+        gridEl.innerHTML = st.teams.map((t, idx) => {
+          if(idx === selectedTeam) return "";
+          return `<button onclick="castVote(${idx})" style="padding:12px;border-radius:13px;background:rgba(148,163,184,.08);border:1px solid var(--border);cursor:pointer;color:var(--text);font-weight:800;font-size:13px;text-align:center;transition:.15s" onmouseover="this.style.background=\'rgba(124,58,237,.2)\'" onmouseout="this.style.background=\'rgba(148,163,184,.08)\'">${t.name}</button>`;
+        }).join("");
+      }
+    }
+
+    const presetEl = el("betPresetRow");
+    if(presetEl && !alreadyBet){
+      const presets = [
+        {label:"₹50L",val:5000000},{label:"₹1Cr",val:10000000},
+        {label:"₹2Cr",val:20000000},{label:"10%",val:Math.floor(total*0.10)},
+        {label:"25%",val:maxBet}
+      ].filter(p => p.val >= minBet && p.val <= team.cash);
+      presetEl.innerHTML = presets.map(p =>
+        `<button class="pct-btn" onclick="document.getElementById(\'participantBetInput\').value=${p.val};updateBetPreview()">${p.label}</button>`
+      ).join("");
+    }
+
+    const betConfEl = el("betConfirmedMsg");
+    const submitBtn = el("submitBetBtn");
+    const betInput  = el("participantBetInput");
+    if(alreadyBet){
+      if(betConfEl){ betConfEl.style.display=""; el("betAmountConfirmed").textContent=formatINR(team.betPlaced); }
+      if(submitBtn) submitBtn.disabled = true;
+      if(betInput)  betInput.disabled  = true;
+    } else {
+      if(betConfEl) betConfEl.style.display = "none";
+      if(submitBtn) submitBtn.disabled = false;
+      if(betInput)  betInput.disabled  = false;
+    }
+  }
+
+  function castVote(targetIdx){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team){ alert("No team selected."); return; }
+    if(st.round !== 5){ alert("Voting is only open in Round 5."); return; }
+    if(team.vote !== "" && team.vote !== null && team.vote !== undefined){ alert("Already voted."); return; }
+    const target = st.teams[targetIdx];
+    if(!target){ alert("Invalid team."); return; }
+    if(!confirm(`Vote for ${target.name}?\n\nFinal and confidential until moderator reveals.`)) return;
+    const idx = selectedTeam;
+    sessionRef.child(`teams/${idx}`).transaction(t=>{t=t&&typeof t==="object"?t:{};t.vote=String(targetIdx);return t;},
+      (err,committed)=>{
+        if(err||!committed){alert("Failed. Try again.");return;}
+        sessionRef.child("logs").transaction(logs=>{logs=Array.isArray(logs)?logs:[];logs.push({time:nowTime(),message:`🗳️ ${team.name} cast their vote in Round 5.`});return logs.slice(-120);},()=>{});
+        sessionRef.child("_participantDirty").set(true).catch(()=>{});
+        if(currentState&&currentState.teams&&currentState.teams[idx])currentState.teams[idx].vote=String(targetIdx);
+        render();
+      },false);
+  }
+
+  function updateBetPreview(){
+    const st=currentState?currentState:defaultState();
+    const team=selectedTeamObj(st);
+    const box=el("betPreviewBox");
+    if(!box||!team)return;
+    const amt=Number(el("participantBetInput").value);
+    const total=computePortfolioValue(team,st);
+    const maxBet=Math.floor(total*0.25);
+    if(!amt||amt<=0){box.innerHTML="";return;}
+    let warn="";
+    if(amt<5000000) warn=`⚠️ Min bet is ₹50 Lakhs.`;
+    else if(amt>maxBet) warn=`⚠️ Max bet is 25% = ${formatINR(maxBet)}.`;
+    else if(amt>team.cash) warn=`⚠️ Exceeds cash (${formatINR(team.cash)}).`;
+    const ok=!warn;
+    box.innerHTML=`<div style="padding:10px 14px;border-radius:12px;background:${ok?"rgba(16,185,129,.10)":"rgba(245,158,11,.10)"};border:1px solid ${ok?"rgba(16,185,129,.3)":"rgba(245,158,11,.3)"};font-size:12px">${warn||`Bet: <strong>${formatINR(amt)}</strong> · Cash after: <strong>${formatINR(team.cash-amt)}</strong> · Win: <strong>+${formatINR(amt)}</strong>`}</div>`;
+  }
+
+  function submitBet(){
+    const st=currentState?currentState:defaultState();
+    const team=selectedTeamObj(st);
+    if(!team){alert("No team.");return;}
+    if(st.round!==5){alert("Betting only in Round 5.");return;}
+    if(Number(team.betPlaced)>0){alert("Bet already placed.");return;}
+    const amt=Math.floor(Number(el("participantBetInput").value)||0);
+    const total=computePortfolioValue(team,st);
+    const maxBet=Math.floor(total*0.25);
+    if(amt<5000000){alert("Min ₹50 Lakhs.");return;}
+    if(amt>maxBet){alert(`Max 25% = ${formatINR(maxBet)}.`);return;}
+    if(amt>team.cash){alert(`Not enough cash (${formatINR(team.cash)}).`);return;}
+    if(!confirm(`Place bet of ${formatINR(amt)}?\n\nDeducted now. Win ×2 if your team becomes Influence Leader, else lost.`))return;
+    const idx=selectedTeam;
+    sessionRef.child(`teams/${idx}`).transaction(t=>{t=t&&typeof t==="object"?t:{};t.cash=Number(t.cash||0)-amt;t.betPlaced=amt;return t;},
+      (err,committed)=>{
+        if(err||!committed){alert("Failed. Try again.");return;}
+        sessionRef.child("logs").transaction(logs=>{logs=Array.isArray(logs)?logs:[];logs.push({time:nowTime(),message:`💰 ${team.name} placed a bet of ${formatINR(amt)} in Round 5.`});return logs.slice(-120);},()=>{});
+        sessionRef.child("_participantDirty").set(true).catch(()=>{});
+        if(currentState&&currentState.teams&&currentState.teams[idx]){currentState.teams[idx].cash=Number(currentState.teams[idx].cash)-amt;currentState.teams[idx].betPlaced=amt;}
+        render();
+      },false);
+  }
+
+  window.castVote=castVote;
+  window.updateBetPreview=updateBetPreview;
+  window.submitBet=submitBet;
+
+  // ─── Live Auction (participant side) ─────────────────────────────
+  let pAuctionRef = null;
+  let _auctionCountdownP = null;
+  let _lastAuctionActive = false;
+
+  function startAuctionListener(){
+    if(!fbDb || !currentSession) return;
+    if(pAuctionRef) pAuctionRef.off("value");
+    pAuctionRef = fbDb.ref("sessions/" + currentSession + "/auction");
+    pAuctionRef.on("value", function(snap){
+      const data = snap.exists() ? snap.val() : null;
+      renderParticipantAuction(data);
+    });
+  }
+
+  function fmtINR(v){
+    const n=Math.round(Number(v)||0);
+    if(n>=10000000) return "₹"+(n/10000000).toFixed(2)+"Cr";
+    if(n>=100000)   return "₹"+(n/100000).toFixed(1)+"L";
+    return "₹"+n.toLocaleString("en-IN");
+  }
+
+  function renderParticipantAuction(auction){
+    const panel = el("liveAuctionPanel");
+    if(!panel) return;
+
+    const isActive = auction && auction.active;
+
+    // Animate in when auction starts
+    if(isActive && !_lastAuctionActive){
+      panel.style.display = "";
+      panel.scrollIntoView({ behavior:"smooth", block:"center" });
+    } else if(!isActive){
+      // Show briefly then hide if settled
+      if(_lastAuctionActive && auction && auction.settled){
+        setTimeout(() => { if(panel) panel.style.display = "none"; }, 8000);
+      } else if(!_lastAuctionActive){
+        panel.style.display = "none";
+      }
+    }
+    _lastAuctionActive = !!isActive;
+
+    if(!auction){ panel.style.display = "none"; return; }
+
+    panel.style.display = "";
+
+    const bids   = auction.bids ? (Array.isArray(auction.bids) ? auction.bids : Object.values(auction.bids)) : [];
+    const topBid = bids.length ? bids[bids.length - 1] : null;
+    const floor  = Number(auction.startingPrice || 0);
+    const curBid = topBid ? Number(topBid.amount) : floor;
+    const minNext= curBid + Number(auction.minIncrement || 0);
+
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    const myBids = bids.filter(b => Number(b.teamIdx) === selectedTeam);
+    const imLeading = topBid && Number(topBid.teamIdx) === selectedTeam;
+
+    // Header
+    const nameEl = el("auctionItemName");
+    if(nameEl) nameEl.textContent = auction.item || "—";
+
+    // Metrics
+    const curBidEl = el("auctionCurrentBid");
+    if(curBidEl) curBidEl.textContent = topBid ? fmtINR(topBid.amount) : "No bids — floor " + fmtINR(floor);
+
+    const leaderEl = el("auctionLeader");
+    if(leaderEl){
+      leaderEl.textContent = topBid ? (imLeading ? "🏆 YOU" : topBid.teamName) : "—";
+      leaderEl.style.color = imLeading ? "#a7f3d0" : "";
+    }
+
+    const minNextEl = el("auctionMinNext");
+    if(minNextEl) minNextEl.textContent = fmtINR(minNext);
+
+    // Your status
+    const cashEl = el("auctionYourCash");
+    if(cashEl) cashEl.textContent = team ? fmtINR(team.cash) : "—";
+    const bidCntEl = el("auctionYourBidCount");
+    if(bidCntEl) bidCntEl.textContent = myBids.length;
+
+    // Countdown
+    const cdBadge = el("auctionCountdownBadge");
+    if(cdBadge){
+      if(auction.endsAt && auction.endsAt > 0){
+        cdBadge.style.display = "";
+        if(_auctionCountdownP) clearInterval(_auctionCountdownP);
+        _auctionCountdownP = setInterval(() => {
+          const rem = Math.max(0, Math.floor((auction.endsAt - Date.now()) / 1000));
+          if(cdBadge) cdBadge.textContent = "⏱ " + rem + "s";
+          if(rem === 0){ clearInterval(_auctionCountdownP); }
+        }, 400);
+      } else {
+        cdBadge.style.display = "none";
+      }
+    }
+
+    // Bid section / won message / ended message
+    const bidSection = el("auctionBidSection");
+    const winMsg     = el("auctionWinMsg");
+    const endedMsg   = el("auctionEndedMsg");
+
+    if(!isActive && auction.settled){
+      if(bidSection) bidSection.style.display = "none";
+      if(winMsg)   winMsg.style.display   = (auction.winner && Number(auction.winner.teamIdx) === selectedTeam) ? "" : "none";
+      if(endedMsg) endedMsg.style.display = (auction.winner && Number(auction.winner.teamIdx) !== selectedTeam) ? "" : "none";
+      if(endedMsg && auction.winner) endedMsg.textContent = `Auction closed. Won by ${auction.winner.teamName} for ${fmtINR(auction.winner.amount)}.`;
+    } else if(!isActive){
+      if(bidSection) bidSection.style.display = "none";
+      if(winMsg)     winMsg.style.display   = "none";
+      if(endedMsg)   endedMsg.style.display = "";
+      if(endedMsg)   endedMsg.textContent   = "Auction cancelled.";
+    } else {
+      if(bidSection) bidSection.style.display = "";
+      if(winMsg)     winMsg.style.display   = "none";
+      if(endedMsg)   endedMsg.style.display = "none";
+    }
+
+    // Quick bid buttons: current + increment multiples
+    const quickEl = el("auctionQuickBtns");
+    if(quickEl && isActive){
+      const steps = [1, 2, 3, 5].map(m => minNext + (m-1) * Number(auction.minIncrement));
+      quickEl.innerHTML = steps.map(v =>
+        `<button class="pct-btn" onclick="document.getElementById('auctionBidInput').value=${v};updateAuctionBidPreview()">${fmtINR(v)}</button>`
+      ).join("");
+    }
+
+    // Bid history
+    const histEl = el("auctionBidHistory");
+    if(histEl){
+      if(!bids.length){
+        histEl.innerHTML = `<div class="footer-note">No bids yet — floor is ${fmtINR(floor)}.</div>`;
+      } else {
+        histEl.innerHTML = [...bids].reverse().map((b, i) => {
+          const isMe  = Number(b.teamIdx) === selectedTeam;
+          const isTop = i === 0;
+          const cls   = isTop ? "bid-history-row top" : isMe ? "bid-history-row mine" : "bid-history-row";
+          return `<div class="${cls}">
+            <span class="muted">${b.time}</span>
+            <span style="font-weight:700">${b.teamName}${isMe ? " (you)" : ""}</span>
+            <span style="font-weight:900">${fmtINR(b.amount)} ${isTop ? "🏆" : ""}</span>
+          </div>`;
+        }).join("");
+      }
+    }
+  }
+
+  function updateAuctionBidPreview(){
+    const auction = null; // will be read from last rendered state via pAuctionRef
+    const box = el("auctionBidPreview");
+    const input = el("auctionBidInput");
+    if(!box || !input) return;
+    const amt = Number(input.value);
+    if(!amt || amt <= 0){ box.innerHTML = ""; return; }
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team){ box.innerHTML = ""; return; }
+    const ok = amt <= team.cash;
+    box.innerHTML = `<div style="padding:8px 12px;border-radius:10px;background:${ok?"rgba(16,185,129,.10)":"rgba(239,68,68,.10)"};border:1px solid ${ok?"rgba(16,185,129,.3)":"rgba(239,68,68,.3)"};font-size:12px">
+      ${ok ? `Bidding <strong>${fmtINR(amt)}</strong> · Cash remaining if won: <strong>${fmtINR(team.cash - amt)}</strong>` : `⚠️ Exceeds your cash balance (${fmtINR(team.cash)})`}
+    </div>`;
+  }
+
+  function placeBid(){
+    if(!pAuctionRef){ alert("Not connected."); return; }
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team){ alert("Select your team first."); return; }
+    if(selectedTeam === null){ alert("No team selected."); return; }
+
+    const bidAmt = Math.floor(Number(el("auctionBidInput").value) || 0);
+    if(bidAmt <= 0){ alert("Enter a valid bid amount."); return; }
+    if(bidAmt > team.cash){ alert(`Not enough cash. You have ${fmtINR(team.cash)}.`); return; }
+
+    pAuctionRef.once("value").then(snap => {
+      if(!snap.exists()){ alert("No active auction."); return; }
+      const auction = snap.val();
+      if(!auction || !auction.active){ alert("Auction is no longer active."); return; }
+
+      const bids   = auction.bids ? (Array.isArray(auction.bids) ? auction.bids : Object.values(auction.bids)) : [];
+      const topBid = bids.length ? bids[bids.length - 1] : null;
+      const floor  = Number(auction.startingPrice || 0);
+      const curBid = topBid ? Number(topBid.amount) : floor - Number(auction.minIncrement || 0);
+      const minNext= curBid + Number(auction.minIncrement || 0);
+
+      if(bidAmt < minNext){ alert(`Your bid must be at least ${fmtINR(minNext)}.`); return; }
+      if(topBid && Number(topBid.teamIdx) === selectedTeam){ 
+        if(!confirm(`You are already the highest bidder at ${fmtINR(topBid.amount)}. Bid ${fmtINR(bidAmt)} anyway?`)) return;
+      }
+
+      const newBid = {
+        teamIdx:  selectedTeam,
+        teamName: team.name,
+        amount:   bidAmt,
+        time:     nowTime()
+      };
+
+      // Atomic push to auction/bids
+      pAuctionRef.child("bids").transaction(bidsData => {
+        const arr = bidsData ? (Array.isArray(bidsData) ? bidsData : Object.values(bidsData)) : [];
+        // Re-validate inside transaction
+        const latestTop = arr.length ? arr[arr.length - 1] : null;
+        const latestCur = latestTop ? Number(latestTop.amount) : floor - Number(auction.minIncrement||0);
+        const latestMin = latestCur + Number(auction.minIncrement||0);
+        if(bidAmt < latestMin) return; // abort transaction — someone outbid while we were confirming
+        arr.push(newBid);
+        return arr;
+      }, (err, committed) => {
+        if(err){ alert("Bid failed: " + err.message); return; }
+        if(!committed){ alert(`Someone placed a higher bid just now! Refresh and try again with at least ${fmtINR(minNext + Number(auction.minIncrement||0))}.`); return; }
+        el("auctionBidInput").value = "";
+        el("auctionBidPreview").innerHTML = "";
+      }, false);
+    });
+  }
+
+  window.placeBid = placeBid;
+  window.updateAuctionBidPreview = updateAuctionBidPreview;
+
+  // ─── New Trading Engine ────────────────────────────────────────
+  let tradeMode = "buy";          // "buy" | "sell"
+  let selectedTradeAsset = ASSETS[0]; // persists across render() calls
+
+  function setTradeMode(mode){
+    tradeMode = mode;
+    el("tabBuy").className  = "trade-tab" + (mode === "buy"  ? " active-buy"  : "");
+    el("tabSell").className = "trade-tab" + (mode === "sell" ? " active-sell" : "");
+    el("tradeExecuteBtn").textContent = mode === "buy" ? "🟢 Confirm Buy" : "🔴 Confirm Sell";
+    el("tradeExecuteBtn").className   = "btn " + (mode === "buy" ? "good" : "bad");
+    el("tradeModePill").textContent   = mode === "buy" ? "🟢 Buying" : "🔴 Selling";
+    el("tradeModePill").className     = "pill " + (mode === "buy" ? "good" : "bad");
+    el("tradeAmountInput").value = "";
+    el("tradePreview").className = "trade-preview";
+    renderAssetPicker();
+    renderPctButtons();
+  }
+
+  function renderAssetPicker(){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team){ el("assetPicker").innerHTML = ""; return; }
+    el("assetPicker").innerHTML = ASSETS.map(a => {
+      const invested = Number(team.assets?.[a] || 0);
+      const news     = Number(st.globalNews?.[a] || 0);
+      const eff      = (Number(team.immunityRound) === Number(st.round) && news < 0) ? 0 : news;
+      const current  = invested * (1 + eff * Number(team.marketMultiplier || 1));
+      const newsPct  = (eff * 100).toFixed(1);
+      const newsCls  = eff > 0 ? "good-text" : eff < 0 ? "bad-text" : "warn-text";
+      const sel      = a === selectedTradeAsset;
+      const cls      = sel ? (tradeMode === "buy" ? "asset-pill sel-buy" : "asset-pill sel-sell") : "asset-pill";
+      return `<button class="${cls}" onclick="selectTradeAsset('${a}')">
+        <div>
+          <div class="ap-name">${a}</div>
+          <div class="ap-held">${invested > 0 ? "Held: " + formatINR(invested) : "Not held"}</div>
+        </div>
+        <div class="${newsCls} ap-news">${eff >= 0 ? "+" : ""}${newsPct}%</div>
+        <div class="ap-val">${invested > 0 ? formatINR(current) : "—"}</div>
+      </button>`;
+    }).join("");
+  }
+
+  function selectTradeAsset(asset){
+    selectedTradeAsset = asset;
+    renderAssetPicker();
+    updateTradePreview();
+  }
+
+  function renderPctButtons(){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team){ el("pctRow").innerHTML = ""; return; }
+    const base = tradeMode === "buy"
+      ? team.cash
+      : Number(team.assets?.[selectedTradeAsset] || 0);
+    const label = tradeMode === "buy" ? "of cash" : "of holding";
+    if(base <= 0){ el("pctRow").innerHTML = ""; return; }
+    el("pctRow").innerHTML = [10, 25, 50, 75, 100].map(p =>
+      `<button class="pct-btn" onclick="setPct(${p})">${p}%</button>`
+    ).join("") + `<span class="tiny muted" style="align-self:center;margin-left:4px">${label}</span>`;
+  }
+
+  function setPct(pct){
+    const st   = currentState ? currentState : defaultState();
+    const team = selectedTeamObj(st);
+    if(!team) return;
+    const base = tradeMode === "buy"
+      ? team.cash
+      : Number(team.assets?.[selectedTradeAsset] || 0);
+    el("tradeAmountInput").value = Math.floor(base * pct / 100);
+    updateTradePreview();
+  }
+
+  function updateTradePreview(){
+    const st     = currentState ? currentState : defaultState();
+    const team   = selectedTeamObj(st);
+    const amount = Number(el("tradeAmountInput").value);
+    const box    = el("tradePreview");
+    if(!team || !amount || amount <= 0){
+      box.className = "trade-preview";
+      return;
+    }
+    const asset    = selectedTradeAsset;
+    const invested = Number(team.assets?.[asset] || 0);
+    const news     = Number(st.globalNews?.[asset] || 0);
+    const eff      = (Number(team.immunityRound) === Number(st.round) && news < 0) ? 0 : news;
+    const mult     = Number(team.marketMultiplier || 1);
+    const isBuy    = tradeMode === "buy";
+
+    let warn = "";
+    if(isBuy){
+      if(amount > team.cash)        warn = "⚠️ Amount exceeds your cash balance!";
+      else if(amount > team.cash * 0.8) warn = "⚠️ This uses over 80% of your cash.";
+    } else {
+      if(amount > invested)         warn = "⚠️ Amount exceeds your holdings in this asset!";
+      else if(amount > invested * 0.8) warn = "⚠️ This sells over 80% of your position.";
+    }
+
+    const cashAfter    = isBuy ? team.cash - amount : team.cash + amount;
+    const heldAfter    = isBuy ? invested + amount  : Math.max(0, invested - amount);
+    const currentVal   = heldAfter * (1 + eff * mult);
+
+    box.className = `trade-preview show preview-${tradeMode}`;
+    box.innerHTML = `
+      <div style="font-weight:800;font-size:13px;margin-bottom:10px">
+        ${isBuy ? "🟢 BUY" : "🔴 SELL"} ${formatINR(amount)} of <strong>${asset}</strong>
+      </div>
+      <div class="preview-row"><span class="muted">Cash before</span><span>${formatINR(team.cash)}</span></div>
+      <div class="preview-row"><span class="muted">Cash after</span><span style="font-weight:800">${formatINR(cashAfter)}</span></div>
+      <div class="preview-row"><span class="muted">${asset} holding after</span><span>${formatINR(heldAfter)}</span></div>
+      <div class="preview-row"><span class="muted">Market value at current news</span><span class="${eff >= 0 ? "good-text" : "bad-text"}">${formatINR(currentVal)}</span></div>
+      ${warn ? `<div class="preview-warn">${warn}</div>` : ""}
+    `;
+  }
+
+  function executeTrade(){
+    const st     = currentState ? currentState : defaultState();
+    const team   = selectedTeamObj(st);
+    const amount = Number(el("tradeAmountInput").value);
+    if(!team){ alert("Select your team first."); return; }
+    if(!amount || amount <= 0){ alert("Enter a valid amount."); return; }
+    const asset  = selectedTradeAsset;
+    const isBuy  = tradeMode === "buy";
+
+    // Hard-stop guards (not just warnings)
+    if(isBuy && amount > team.cash){
+      alert(`❌ Not enough cash!\n\nYou need ${formatINR(amount)} but only have ${formatINR(team.cash)}.`);
+      return;
+    }
+    if(!isBuy && amount > Number(team.assets?.[asset] || 0)){
+      alert(`❌ Not enough ${asset} holdings!\n\nYou're trying to sell ${formatINR(amount)} but only hold ${formatINR(team.assets?.[asset] || 0)}.`);
+      return;
+    }
+
+    // Confirmation dialog
+    const confirmed = confirm(
+      `Confirm ${isBuy ? "BUY" : "SELL"}:\n\n` +
+      `  Asset : ${asset}\n` +
+      `  Amount: ${formatINR(amount)}\n\n` +
+      `Cash balance after: ${formatINR(isBuy ? team.cash - amount : team.cash + amount)}\n\n` +
+      `Tap OK to execute. This will be logged and visible to the moderator.`
+    );
+    if(!confirmed) return;
+
+    applyTeamTrade(tradeMode, asset, amount);
+    el("tradeAmountInput").value = "";
+    el("tradePreview").className = "trade-preview";
+  }
+
+  function buyAsset(){ /* legacy — now handled by executeTrade() */ }
+  function sellAsset(){ /* legacy */ }
+  function connectAndJoin(cfg, sessionCode){ if(!initFirebase(cfg)) return false; startSession(sessionCode); showApp(); return true; }
+  function saveConnectAndJoin(){ const cfg = { apiKey: el("cfg_apiKey").value.trim(), authDomain: el("cfg_authDomain").value.trim(), databaseURL: el("cfg_databaseURL").value.trim(), projectId: el("cfg_projectId").value.trim() }; const code = el("sessionInput").value.trim().toUpperCase(); if(!code){ alert("Enter a session code."); return; } saveConfig(cfg); if(connectAndJoin(cfg, code)){ saveSession(code); updateJoinQr(); } }
+  function loadSavedAndJoin(){ const cfg = loadConfig(); const code = (el("sessionInput").value || loadSession() || new URLSearchParams(location.search).get("session") || "").trim().toUpperCase(); if(!cfg){ alert("No saved Firebase config found."); return; } if(!code){ alert("Enter a session code."); return; } el("cfg_apiKey").value = cfg.apiKey || ""; el("cfg_authDomain").value = cfg.authDomain || ""; el("cfg_databaseURL").value = cfg.databaseURL || ""; el("cfg_projectId").value = cfg.projectId || ""; if(connectAndJoin(cfg, code)){ saveSession(code); el("sessionInput").value = code; updateJoinQr(); } }
+  function autoStartIfPossible(){
+    const savedCfg = loadConfig();
+    const params = new URLSearchParams(location.search);
+    const sessionFromUrl = (params.get("session") || "").trim().toUpperCase();
+    const savedSession = loadSession();
+    const cfg = savedCfg;
+    if(cfg){
+      el("cfg_apiKey").value = cfg.apiKey || "";
+      el("cfg_authDomain").value = cfg.authDomain || "";
+      el("cfg_databaseURL").value = cfg.databaseURL || "";
+      el("cfg_projectId").value = cfg.projectId || "";
+    }
+    const code = sessionFromUrl || savedSession;
+    if(code) el("sessionInput").value = code;
+    updateJoinQr();
+    if(cfg && code){
+      connectAndJoin(cfg, code);
+      const team = loadTeam();
+      if(team !== null && Number.isFinite(team)) {
+        selectedTeam = team;
+      }
+      if (selectedTeam !== null) {
+        saveTeamLock();
+      }
+    } else {
+      showSetup();
+    }
+  }
+  function chooseDifferentTeam(){
+    if (selectedTeam !== null || loadTeamLock()) {
+      alert("This device is locked to its selected team. Use Leave Session or Reset Setup to start over.");
+      return;
+    }
+    clearTeam();
+    el("selectorPanel").classList.remove("hidden");
+    render();
+  }
+  function leaveSession(){ if(!confirm("Leave this session on this device?")) return; clearSession(); clearTeam(); if(sessionRef) sessionRef.off(); sessionRef = null; currentSession = ""; currentState = null; showSetup(); updateSyncBadge("warn", "Connecting…"); }
+  window.saveConnectAndJoin = saveConnectAndJoin; window.loadSavedAndJoin = loadSavedAndJoin; window.copyJoinLink = copyJoinLink; window.resetSetup = resetSetup; window.chooseDifferentTeam = chooseDifferentTeam; window.leaveSession = leaveSession; window.buyAsset = buyAsset; window.sellAsset = sellAsset; window.updateJoinQr = updateJoinQr;
+  window.setTradeMode = setTradeMode; window.selectTradeAsset = selectTradeAsset; window.setPct = setPct; window.updateTradePreview = updateTradePreview; window.executeTrade = executeTrade;
+  function loadTeamSelectionFromStorage(){
+    const v = loadTeam();
+    if(v === null || !Number.isFinite(v)) return;
+    selectedTeam = v;
+    if (loadTeamLock()) {
+      saveTeamLock();
+    }
+  }
+  loadTeamSelectionFromStorage(); autoStartIfPossible(); if(!currentState) currentState = defaultState(); render();
+  window.addEventListener("resize", () => render());
+})();
+</script>
+</body>
+</html>
